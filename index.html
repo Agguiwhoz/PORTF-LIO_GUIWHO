@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- =============================================
+       TÍTULO DA PÁGINA — edite aqui
+  ============================================= -->
+  <title>Seu Nome · Designer Gráfico</title>
+
+  <!-- Google Fonts: Clash Display (título) + DM Sans (corpo) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ================================================
+       VARIÁVEIS GLOBAIS — altere aqui para mudar o tema
+    ================================================ */
+    :root {
+      --bg:          #0d0d0d;      /* fundo principal (preto profundo)         */
+      --surface:     #161616;      /* fundo dos cards e seções alternadas      */
+      --border:      #2a2a2a;      /* cor das bordas sutis                     */
+      --accent:      #ff4d00;      /* cor de destaque — laranja vibrante       */
+      --accent-soft: #ff6b2b;      /* versão mais clara do accent              */
+      --text:        #f0ece4;      /* cor do texto principal                   */
+      --muted:       #7a7570;      /* texto secundário / labels                */
+      --font-title:  'Playfair Display', serif;   /* fonte dos títulos grandes */
+      --font-body:   'DM Sans', sans-serif;       /* fonte do corpo do texto   */
+      --radius:      12px;         /* arredondamento dos cards                 */
+      --max-width:   1180px;       /* largura máxima do conteúdo               */
+      --transition:  0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* animação padrão */
+    }
+
+    /* ================================================
+       RESET E BASE
+    ================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: clamp(15px, 1.1vw, 17px);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Link padrão */
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    /* Imagens responsivas */
+    img { max-width: 100%; display: block; }
+
+    /* Container reutilizável */
+    .container {
+      width: 90%;
+      max-width: var(--max-width);
+      margin-inline: auto;
+    }
+
+    /* ================================================
+       CURSOR PERSONALIZADO (remove se não quiser)
+    ================================================ */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, opacity 0.2s;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: all 0.12s ease;
+      opacity: 0.6;
+    }
+
+    /* ================================================
+       BARRA DE NAVEGAÇÃO
+    ================================================ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.2rem 0;
+      /* O fundo fica transparente e vai ficando sólido ao rolar */
+      transition: background var(--transition), backdrop-filter var(--transition);
+    }
+    nav.scrolled {
+      background: rgba(13,13,13,0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    /* Logo / nome no canto esquerdo */
+    .nav-logo {
+      font-family: var(--font-title);
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    /* Links de navegação */
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* Botão CTA na nav */
+    .nav-cta {
+      display: inline-block;
+      padding: 0.55rem 1.4rem;
+      border: 1px solid var(--accent);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      transition: all var(--transition);
+    }
+    .nav-cta:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* Menu hambúrguer (mobile) */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ================================================
+       SEÇÃO HERO
+    ================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grade decorativa de fundo */
+    #hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.3;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    }
+
+    /* Brilho/glow laranja no fundo */
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: 20%; left: 60%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(255,77,0,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    /* Tag acima do título principal */
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+    .hero-tag::before {
+      content: '';
+      display: block;
+      width: 24px; height: 1px;
+      background: var(--accent);
+    }
+
+    /* Título grande do hero */
+    .hero-title {
+      font-family: var(--font-title);
+      font-size: clamp(3.2rem, 8vw, 7.5rem);
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      font-weight: 900;
+      margin-bottom: 2rem;
+    }
+    /* Palavra em itálico com cor diferente */
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      margin-bottom: 3rem;
+    }
+
+    /* Grupo de botões do hero */
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Botão primário */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.9rem 2rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      transition: all var(--transition);
+    }
+    .btn-primary:hover {
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+    }
+
+    /* Botão secundário (ghost) */
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    .btn-ghost:hover { color: var(--text); }
+
+    /* Rótulos de skills flutuantes (decorativos) */
+    .hero-badges {
+      position: absolute;
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 1;
+    }
+    .badge {
+      padding: 0.7rem 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: float 4s ease-in-out infinite;
+    }
+    /* Delay diferente para cada badge para efeito de "flutuação" */
+    .badge:nth-child(2) { animation-delay: 1s; }
+    .badge:nth-child(3) { animation-delay: 2s; }
+    .badge-dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    /* Contador de projetos no hero */
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 4rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .stat-number {
+      font-family: var(--font-title);
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+
+    /* ================================================
+       FAIXA ANIMADA (marquee)
+    ================================================ */
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+      background: var(--surface);
+    }
+    .marquee-track {
+      display: flex;
+      gap: 3rem;
+      white-space: nowrap;
+      animation: marquee 20s linear infinite;
+    }
+    .marquee-item {
+      font-family: var(--font-title);
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .marquee-dot {
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ================================================
+       SEÇÃO SOBRE
+    ================================================ */
+    #sobre {
+      padding: 7rem 0;
+    }
+
+    /* Label de seção reutilizável */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+    }
+    .section-label::before {
+      content: '';
+      width: 20px; height: 1px;
+      background: var(--accent);
+    }
+
+    /* Título de seção padrão */
+    .section-title {
+      font-family: var(--font-title);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    .section-title em { font-style: italic; color: var(--accent); }
+
+    /* Grid de duas colunas para a seção Sobre */
+    .sobre-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    /* Bloco de foto/avatar */
+    .sobre-image-wrap {
+      position: relative;
+    }
+    /* Foto principal */
+    .sobre-photo {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      border-radius: var(--radius);
+      filter: grayscale(20%);
+    }
+    /* Placeholder quando não há foto */
+    .sobre-photo-placeholder {
+      width: 100%;
+      aspect-ratio: 4/5;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .sobre-photo-placeholder svg { opacity: 0.3; }
+
+    /* Quadrado decorativo laranja atrás da foto */
+    .sobre-image-wrap::before {
+      content: '';
+      position: absolute;
+      top: -12px; left: -12px;
+      width: 120px; height: 120px;
+      background: var(--accent);
+      border-radius: 6px;
+      z-index: -1;
+      opacity: 0.6;
+    }
+    /* Card de anos de experiência sobre a foto */
+    .sobre-badge {
+      position: absolute;
+      bottom: -20px; right: -20px;
+      background: var(--accent);
+      color: #fff;
+      padding: 1.2rem 1.5rem;
+      border-radius: var(--radius);
+      text-align: center;
+    }
+    .sobre-badge strong {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .sobre-badge span { font-size: 0.75rem; letter-spacing: 0.05em; }
+
+    /* Texto da bio */
+    .sobre-bio {
+      color: var(--muted);
+      line-height: 1.9;
+      margin-bottom: 2rem;
+    }
+
+    /* Lista de habilidades técnicas */
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 2.5rem;
+    }
+    .skill-tag {
+      padding: 0.4rem 1rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all var(--transition);
+    }
+    .skill-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ================================================
+       SEÇÃO SERVIÇOS
+    ================================================ */
+    #servicos {
+      padding: 7rem 0;
+      background: var(--surface);
+    }
+
+    .servicos-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4rem;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    /* Grid de cards de serviços */
+    .servicos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5px;            /* espaçamento de grade apertado */
+      background: var(--border);  /* cria linhas entre os cards */
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .servico-card {
+      background: var(--surface);
+      padding: 2.5rem;
+      transition: background var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    .servico-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--accent);
+      transition: width var(--transition);
+    }
+    .servico-card:hover { background: rgba(255,77,0,0.04); }
+    .servico-card:hover::after { width: 100%; }
+
+    /* Ícone do serviço */
+    .servico-icon {
+      width: 48px; height: 48px;
+      background: rgba(255,77,0,0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+    }
+
+    .servico-title {
+      font-family: var(--font-title);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .servico-desc {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    /* ================================================
+       SEÇÃO PORTFÓLIO / PROJETOS
+    ================================================ */
+    #projetos {
+      padding: 7rem 0;
+    }
+
+    .projetos-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    /* Filtros de categoria */
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 0.45rem 1.1rem;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: none;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: all var(--transition);
+    }
+    .filter-btn.active,
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Masonry-like grid de projetos */
+    .projetos-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+
+    /* Card de projeto */
+    .projeto-card {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+      cursor: pointer;
+    }
+    /* Variações de tamanho no grid (colunas) */
+    .projeto-card.large   { grid-column: span 7; }
+    .projeto-card.medium  { grid-column: span 5; }
+    .projeto-card.small   { grid-column: span 4; }
+
+    /* Área da imagem (placeholder colorido) */
+    .projeto-img {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s ease;
+    }
+    .projeto-card:hover .projeto-img { transform: scale(1.06); }
+
+    /* Placeholder colorido quando não há imagem real */
+    .projeto-placeholder {
+      width: 100%;
+      aspect-ratio: 16/10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      transition: transform 0.6s ease;
+    }
+    .projeto-card:hover .projeto-placeholder { transform: scale(1.06); }
+
+    /* Overlay com info ao hover */
+    .projeto-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 55%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.8rem;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .projeto-card:hover .projeto-overlay { opacity: 1; }
+
+    .projeto-category {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    .projeto-name {
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .projeto-arrow {
+      position: absolute;
+      top: 1.2rem; right: 1.2rem;
+      width: 36px; height: 36px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transform: translateY(8px) rotate(-45deg);
+      opacity: 0;
+      transition: all var(--transition);
+    }
+    .projeto-card:hover .projeto-arrow {
+      opacity: 1;
+      transform: translateY(0) rotate(0deg);
+    }
+
+    /* ================================================
+       SEÇÃO DEPOIMENTOS
+    ================================================ */
+    #depoimentos {
+      padding: 7rem 0;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    /* Grade de cards de depoimentos */
+    .depoimentos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 4rem;
+    }
+
+    .depo-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .depo-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    /* Estrelas de avaliação */
+    .depo-stars { color: var(--accent); font-size: 0.9rem; margin-bottom: 1rem; }
+
+    .depo-text {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+
+    /* Info do cliente */
+    .depo-client {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .depo-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .depo-name { font-weight: 600; font-size: 0.9rem; }
+    .depo-role { font-size: 0.78rem; color: var(--muted); }
+
+    /* ================================================
+       SEÇÃO CONTATO
+    ================================================ */
+    #contato {
+      padding: 7rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Glow decorativo */
+    #contato::before {
+      content: '';
+      position: absolute;
+      bottom: -100px; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(255,77,0,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .contato-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    /* Email grande no lado esquerdo */
+    .contato-email-link {
+      font-family: var(--font-title);
+      font-size: clamp(1.6rem, 3.5vw, 2.8rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      transition: color var(--transition);
+      word-break: break-all;
+    }
+    .contato-email-link:hover { color: var(--accent); }
+
+    .contato-desc {
+      color: var(--muted);
+      margin: 1.5rem 0 2rem;
+      max-width: 380px;
+      line-height: 1.8;
+    }
+
+    /* Ícones das redes sociais */
+    .social-links {
+      display: flex;
+      gap: 1rem;
+    }
+    .social-link {
+      width: 42px; height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all var(--transition);
+    }
+    .social-link:hover {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+      transform: translateY(-3px);
+    }
+
+    /* Formulário de contato */
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.9rem 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .form-control:focus { border-color: var(--accent); }
+    .form-control::placeholder { color: var(--muted); }
+    textarea.form-control { resize: vertical; min-height: 130px; }
+
+    .form-submit {
+      width: 100%;
+      padding: 1rem;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      transition: all var(--transition);
+      margin-top: 0.5rem;
+    }
+    .form-submit:hover {
+      background: var(--accent-soft);
+      transform: translateY(-2px);
+    }
+
+    /* ================================================
+       RODAPÉ
+    ================================================ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    /* Links de volta ao topo */
+    .back-top {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    .back-top:hover { color: var(--accent); }
+
+    /* ================================================
+       ANIMAÇÕES DE ENTRADA (scroll reveal)
+    ================================================ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Delay em cascata para filhos */
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ================================================
+       RESPONSIVIDADE — MOBILE
+    ================================================ */
+    @media (max-width: 1024px) {
+      .hero-badges { display: none; } /* remove badges flutuantes no tablet */
+      .sobre-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .contato-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .projeto-card.large,
+      .projeto-card.medium,
+      .projeto-card.small { grid-column: span 6; }
+    }
+
+    @media (max-width: 768px) {
+      /* Nav mobile */
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+
+      /* Menu mobile expandido */
+      .mobile-menu {
+        position: fixed;
+        inset: 0;
+        background: var(--bg);
+        z-index: 99;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .mobile-menu.open { opacity: 1; pointer-events: all; }
+      .mobile-menu a {
+        font-family: var(--font-title);
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+
+      /* Projetos em coluna única */
+      .projeto-card.large,
+      .projeto-card.medium,
+      .projeto-card.small { grid-column: span 12; }
+
+      .hero-stats { gap: 2rem; }
+
+      .servicos-header, .projetos-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor personalizado (remove as 2 divs abaixo se não quiser) -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ================================================
+       MENU MOBILE
+  ================================================ -->
+  <div class="mobile-menu" id="mobileMenu">
+    <!-- ✏️ Edite os links do menu mobile aqui -->
+    <a href="#sobre" onclick="closeMobile()">Sobre</a>
+    <a href="#servicos" onclick="closeMobile()">Serviços</a>
+    <a href="#projetos" onclick="closeMobile()">Projetos</a>
+    <a href="#contato" onclick="closeMobile()">Contato</a>
+  </div>
+
+  <!-- ================================================
+       NAVEGAÇÃO
+  ================================================ -->
+  <nav id="navbar">
+    <div class="container nav-inner">
+
+      <!-- ✏️ Substitua "S.N" pelas suas iniciais ou nome curto -->
+      <a href="#" class="nav-logo">S<span>.</span>N</a>
+
+      <!-- ✏️ Links de navegação desktop -->
+      <ul class="nav-links">
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#projetos">Projetos</a></li>
+        <li><a href="#depoimentos">Depoimentos</a></li>
+      </ul>
+
+      <!-- ✏️ Botão CTA no menu -->
+      <a href="#contato" class="nav-cta">Contato</a>
+
+      <!-- Botão hambúrguer (mobile) -->
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================================================
+       HERO
+  ================================================ -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-content">
+
+        <!-- ✏️ Subtítulo acima do nome -->
+        <p class="hero-tag">Designer Gráfico & Visual</p>
+
+        <!-- ✏️ Título principal — substitua "Seu Nome" -->
+        <h1 class="hero-title">
+          Seu<br>
+          <em>Nome</em>
+        </h1>
+
+        <!-- ✏️ Descrição curta sobre você -->
+        <p class="hero-desc">
+          Crio identidades visuais, materiais gráficos e experiências digitais
+          que comunicam com clareza e impactam com beleza.
+          Design que conta histórias.
+        </p>
+
+        <!-- Botões de ação -->
+        <div class="hero-actions">
+          <!-- ✏️ Link do botão principal — pode apontar para #projetos ou um PDF -->
+          <a href="#projetos" class="btn-primary">
+            Ver projetos
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <!-- ✏️ Link para CV/currículo -->
+          <a href="#" class="btn-ghost">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Baixar CV
+          </a>
+        </div>
+
+        <!-- ✏️ Estatísticas — altere os números -->
+        <div class="hero-stats">
+          <div>
+            <p class="stat-number">+80</p>
+            <p class="stat-label">Projetos</p>
+          </div>
+          <div>
+            <p class="stat-number">5</p>
+            <p class="stat-label">Anos de experiência</p>
+          </div>
+          <div>
+            <p class="stat-number">+40</p>
+            <p class="stat-label">Clientes satisfeitos</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges flutuantes (canto direito, oculto em mobile) -->
+      <div class="hero-badges">
+        <!-- ✏️ Edite os textos dos badges -->
+        <div class="badge"><span class="badge-dot"></span> Branding</div>
+        <div class="badge"><span class="badge-dot"></span> UI Design</div>
+        <div class="badge"><span class="badge-dot"></span> Motion</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       FAIXA ANIMADA (marquee)
+       ✏️ Edite as especialidades listadas aqui
+  ================================================ -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marquee">
+      <span class="marquee-item">Identidade Visual</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Brand Design</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Tipografia</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Direção de Arte</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">UI/UX Design</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Motion Graphics</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Embalagens</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Editorial</span>
+      <span class="marquee-dot">·</span>
+      <!-- Duplicata para loop infinito -->
+      <span class="marquee-item">Identidade Visual</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Brand Design</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Tipografia</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Direção de Arte</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">UI/UX Design</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Motion Graphics</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Embalagens</span>
+      <span class="marquee-dot">·</span>
+      <span class="marquee-item">Editorial</span>
+      <span class="marquee-dot">·</span>
+    </div>
+  </div>
+
+  <!-- ================================================
+       SOBRE MIM
+  ================================================ -->
+  <section id="sobre">
+    <div class="container">
+      <div class="sobre-grid">
+
+        <!-- Lado esquerdo: imagem -->
+        <div class="sobre-image-wrap reveal">
+          <!--
+            ✏️ Para adicionar sua foto:
+            1. Substitua a div abaixo por: <img src="sua-foto.jpg" alt="Seu Nome" class="sobre-photo">
+            2. Coloque a imagem na mesma pasta do HTML
+          -->
+          <div class="sobre-photo-placeholder">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span>Sua foto aqui</span>
+          </div>
+
+          <!-- ✏️ Substitua "5" pelos seus anos de experiência -->
+          <div class="sobre-badge">
+            <strong>5+</strong>
+            <span>anos de experiência</span>
+          </div>
+        </div>
+
+        <!-- Lado direito: bio e skills -->
+        <div class="reveal reveal-delay-2">
+          <p class="section-label">Sobre mim</p>
+          <h2 class="section-title">
+            Design com propósito<br>e <em>paixão</em>
+          </h2>
+
+          <!-- ✏️ Escreva sua bio aqui -->
+          <p class="sobre-bio">
+            Sou designer gráfico apaixonado por criar identidades visuais que
+            conectam marcas às pessoas. Com mais de 5 anos de experiência, já ajudei
+            dezenas de empresas a contar suas histórias através de um design
+            estratégico e memorável.
+          </p>
+          <p class="sobre-bio">
+            Acredito que um bom design vai além da estética — ele resolve
+            problemas, comunica valores e gera resultados reais para os negócios.
+          </p>
+
+          <!-- ✏️ Adicione ou remova suas ferramentas/skills aqui -->
+          <div class="skills-list">
+            <span class="skill-tag">Adobe Illustrator</span>
+            <span class="skill-tag">Photoshop</span>
+            <span class="skill-tag">InDesign</span>
+            <span class="skill-tag">Figma</span>
+            <span class="skill-tag">After Effects</span>
+            <span class="skill-tag">Branding</span>
+            <span class="skill-tag">Tipografia</span>
+            <span class="skill-tag">Embalagem</span>
+          </div>
+
+          <!-- ✏️ Link do botão — pode abrir um PDF do currículo -->
+          <a href="#contato" class="btn-primary">
+            Vamos conversar
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       SERVIÇOS
+  ================================================ -->
+  <section id="servicos">
+    <div class="container">
+      <div class="servicos-header">
+        <div class="reveal">
+          <p class="section-label">O que eu faço</p>
+          <h2 class="section-title">Meus <em>serviços</em></h2>
+        </div>
+        <p class="reveal" style="color:var(--muted);max-width:320px;text-align:right;">
+          Soluções criativas do conceito à entrega final.
+        </p>
+      </div>
+
+      <!-- ✏️ Edite os cards de serviços abaixo -->
+      <div class="servicos-grid">
+
+        <!-- Card 1 -->
+        <div class="servico-card reveal">
+          <div class="servico-icon">🎨</div>
+          <!-- ✏️ Título e descrição do serviço -->
+          <h3 class="servico-title">Identidade Visual</h3>
+          <p class="servico-desc">
+            Criação de logos, paletas de cores, tipografias e manuais
+            de marca completos que representam sua empresa.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="servico-card reveal reveal-delay-1">
+          <div class="servico-icon">📱</div>
+          <h3 class="servico-title">Design Digital</h3>
+          <p class="servico-desc">
+            Posts para redes sociais, banners, newsletters e materiais
+            digitais com foco em conversão e identidade.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="servico-card reveal reveal-delay-2">
+          <div class="servico-icon">📦</div>
+          <h3 class="servico-title">Embalagem</h3>
+          <p class="servico-desc">
+            Design de embalagens que encantam no ponto de venda e
+            reforçam o posicionamento da sua marca no mercado.
+          </p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="servico-card reveal">
+          <div class="servico-icon">📖</div>
+          <h3 class="servico-title">Design Editorial</h3>
+          <p class="servico-desc">
+            Catálogos, revistas, livros e relatórios com diagramação
+            profissional e leiturabilidade impecável.
+          </p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="servico-card reveal reveal-delay-1">
+          <div class="servico-icon">🎬</div>
+          <h3 class="servico-title">Motion Graphics</h3>
+          <p class="servico-desc">
+            Animações para redes sociais, apresentações e vídeos que
+            dão vida à sua marca com movimento e ritmo.
+          </p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="servico-card reveal reveal-delay-2">
+          <div class="servico-icon">🖥️</div>
+          <h3 class="servico-title">UI/UX Design</h3>
+          <p class="servico-desc">
+            Interfaces de apps e sites centradas no usuário, com
+            protótipos interativos e fluxos de navegação intuitivos.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       PROJETOS
+  ================================================ -->
+  <section id="projetos">
+    <div class="container">
+      <div class="projetos-header">
+        <div class="reveal">
+          <p class="section-label">Portfólio</p>
+          <h2 class="section-title">Trabalhos <em>selecionados</em></h2>
+        </div>
+
+        <!-- Filtros de categoria -->
+        <div class="filters reveal">
+          <!-- ✏️ Edite as categorias de filtro -->
+          <button class="filter-btn active" onclick="filterProjects(this, 'todos')">Todos</button>
+          <button class="filter-btn" onclick="filterProjects(this, 'branding')">Branding</button>
+          <button class="filter-btn" onclick="filterProjects(this, 'digital')">Digital</button>
+          <button class="filter-btn" onclick="filterProjects(this, 'editorial')">Editorial</button>
+        </div>
+      </div>
+
+      <!-- ✏️ Adicione seus projetos aqui
+           Atributo data-cat: categoria do projeto para filtro
+           Classes: large (7 colunas), medium (5 colunas), small (4 colunas)
+      -->
+      <div class="projetos-grid" id="projetosGrid">
+
+        <!-- Projeto 1 - Grande -->
+        <div class="projeto-card large reveal" data-cat="branding">
+          <!-- ✏️ Substitua a div por <img src="proj1.jpg" class="projeto-img"> -->
+          <div class="projeto-placeholder" style="background:linear-gradient(135deg,#1a0a00,#4a1800)">🔥</div>
+          <div class="projeto-overlay">
+            <p class="projeto-category">Branding</p>
+            <!-- ✏️ Nome do projeto -->
+            <p class="projeto-name">Identidade Visual — Marca X</p>
+          </div>
+          <div class="projeto-arrow">↗</div>
+        </div>
+
+        <!-- Projeto 2 - Médio -->
+        <div class="projeto-card medium reveal reveal-delay-1" data-cat="digital">
+          <div class="projeto-placeholder" style="background:linear-gradient(135deg,#001a0a,#003d1a)">✦</div>
+          <div class="projeto-overlay">
+            <p class="projeto-category">Digital</p>
+            <p class="projeto-name">App Mobile — Fintech</p>
+          </div>
+          <div class="projeto-arrow">↗</div>
+        </div>
+
+        <!-- Projeto 3 - Pequeno -->
+        <div class="projeto-card small reveal" data-cat="editorial">
+          <div class="projeto-placeholder" style="background:linear-gradient(135deg,#0d0d1a,#1a1a4a)">◈</div>
+          <div class="projeto-overlay">
+            <p class="projeto-category">Editorial</p>
+            <p class="projeto-name">Revista Anual</p>
+          </div>
+          <div class="projeto-arrow">↗</div>
+        </div>
+
+        <!-- Projeto 4 - Médio -->
+        <div class="projeto-card medium reveal reveal-delay-1" data-cat="branding">
+          <div class="projeto-placeholder" style="background:linear-gradient(135deg,#1a000d,#4a0026)">⬡</div>
+          <div class="projeto-overlay">
+            <p class="projeto-category">Branding</p>
+            <p class="projeto-name">Rebranding — Restaurante</p>
+          </div>
+          <div class="projeto-arrow">↗</div>
+        </div>
+
+        <!-- Projeto 5 - Pequeno -->
+        <div class="projeto-card small reveal reveal-delay-2" data-cat="digital">
+          <div class="projeto-placeholder" style="background:linear-gradient(135deg,#001a1a,#004040)">⬢</div>
+          <div class="projeto-overlay">
+            <p class="projeto-category">Digital</p>
+            <p class="projeto-name">Social Media Kit</p>
+          </div>
+          <div class="projeto-arrow">↗</div>
+        </div>
+
+        <!-- Projeto 6 - Pequeno -->
+        <div class="projeto-card small reveal reveal-delay-3" data-cat="editorial">
+          <div class="projeto-placeholder" style="background:linear-gradient(135deg,#1a1000,#3d2800)">◇</div>
+          <div class="projeto-overlay">
+            <p class="projeto-category">Editorial</p>
+            <p class="projeto-name">Catálogo de Produto</p>
+          </div>
+          <div class="projeto-arrow">↗</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       DEPOIMENTOS
+  ================================================ -->
+  <section id="depoimentos">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:0">
+        <p class="section-label" style="justify-content:center">O que dizem</p>
+        <h2 class="section-title">Clientes <em>satisfeitos</em></h2>
+      </div>
+
+      <!-- ✏️ Adicione ou edite os depoimentos abaixo -->
+      <div class="depoimentos-grid">
+
+        <!-- Depoimento 1 -->
+        <div class="depo-card reveal">
+          <p class="depo-stars">★★★★★</p>
+          <!-- ✏️ Texto do depoimento -->
+          <p class="depo-text">
+            "Trabalhar com este profissional foi incrível. Ele entendeu exatamente
+            o que a nossa marca precisava e entregou muito além do esperado."
+          </p>
+          <div class="depo-client">
+            <!-- ✏️ Inicial do nome do cliente -->
+            <div class="depo-avatar">M</div>
+            <div>
+              <!-- ✏️ Nome e cargo do cliente -->
+              <p class="depo-name">Maria Silva</p>
+              <p class="depo-role">CEO, Empresa ABC</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Depoimento 2 -->
+        <div class="depo-card reveal reveal-delay-1">
+          <p class="depo-stars">★★★★★</p>
+          <p class="depo-text">
+            "O resultado do projeto foi surpreendente. A identidade visual ficou
+            perfeita e o nosso engajamento nas redes aumentou 40% após o lançamento."
+          </p>
+          <div class="depo-client">
+            <div class="depo-avatar">J</div>
+            <div>
+              <p class="depo-name">João Ferreira</p>
+              <p class="depo-role">Fundador, Startup XYZ</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Depoimento 3 -->
+        <div class="depo-card reveal reveal-delay-2">
+          <p class="depo-stars">★★★★★</p>
+          <p class="depo-text">
+            "Profissional altamente criativo, pontual e muito atencioso. Com certeza
+            voltaremos a trabalhar juntos nos próximos projetos."
+          </p>
+          <div class="depo-client">
+            <div class="depo-avatar">A</div>
+            <div>
+              <p class="depo-name">Ana Costa</p>
+              <p class="depo-role">Diretora de Marketing, Marca Y</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       CONTATO
+  ================================================ -->
+  <section id="contato">
+    <div class="container">
+      <div class="contato-inner">
+
+        <!-- Coluna esquerda: informações de contato -->
+        <div class="reveal">
+          <p class="section-label">Vamos criar juntos</p>
+          <h2 class="section-title">Tem um projeto<br>em <em>mente?</em></h2>
+
+          <!-- ✏️ Substitua pelo seu e-mail -->
+          <a href="mailto:seuemail@email.com" class="contato-email-link">
+            seuemail@email.com
+          </a>
+
+          <!-- ✏️ Edite a descrição -->
+          <p class="contato-desc">
+            Estou disponível para projetos freelance e colaborações.
+            Me mande uma mensagem e respondo em até 24 horas!
+          </p>
+
+          <!-- ✏️ Substitua os "#" pelos seus links de redes sociais -->
+          <div class="social-links">
+            <a href="#" class="social-link" title="Behance">Bē</a>
+            <a href="#" class="social-link" title="Instagram">ig</a>
+            <a href="#" class="social-link" title="LinkedIn">in</a>
+            <a href="#" class="social-link" title="Dribbble">dr</a>
+          </div>
+        </div>
+
+        <!-- Coluna direita: formulário -->
+        <div class="reveal reveal-delay-2">
+          <!-- ✏️ Action do form: substitua pelo seu serviço (Formspree, etc.)
+               Exemplo: action="https://formspree.io/f/XXXXXXXX" method="POST" -->
+          <form onsubmit="handleSubmit(event)">
+
+            <div class="form-group">
+              <label for="nome">Nome</label>
+              <input type="text" id="nome" name="nome" class="form-control"
+                placeholder="Seu nome completo" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" name="email" class="form-control"
+                placeholder="seu@email.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="projeto">Tipo de projeto</label>
+              <input type="text" id="projeto" name="projeto" class="form-control"
+                placeholder="Ex: Identidade Visual, Social Media..." />
+            </div>
+
+            <div class="form-group">
+              <label for="mensagem">Mensagem</label>
+              <textarea id="mensagem" name="mensagem" class="form-control"
+                placeholder="Conte um pouco sobre o seu projeto..." required></textarea>
+            </div>
+
+            <button type="submit" class="form-submit" id="submitBtn">
+              Enviar mensagem
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
+       RODAPÉ
+  ================================================ -->
+  <footer>
+    <div class="container footer-inner">
+      <!-- ✏️ Substitua pelo seu nome e ano atual -->
+      <p class="footer-copy">© 2025 Seu Nome · Todos os direitos reservados</p>
+      <a href="#hero" class="back-top">
+        Voltar ao topo
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </a>
+    </div>
+  </footer>
+
+  <!-- ================================================
+       JAVASCRIPT
+  ================================================ -->
+  <script>
+    /* ----- CURSOR PERSONALIZADO ----- */
+    const cursor = document.getElementById('cursor');
+    const cursorRing = document.getElementById('cursorRing');
+
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+      // O ring tem um pequeno delay para efeito de "perseguição"
+      setTimeout(() => {
+        cursorRing.style.left = e.clientX + 'px';
+        cursorRing.style.top  = e.clientY + 'px';
+      }, 80);
+    });
+
+    // Expande o cursor ao passar sobre elementos clicáveis
+    document.querySelectorAll('a, button, .projeto-card').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width  = '16px';
+        cursor.style.height = '16px';
+        cursorRing.style.width  = '50px';
+        cursorRing.style.height = '50px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width  = '10px';
+        cursor.style.height = '10px';
+        cursorRing.style.width  = '36px';
+        cursorRing.style.height = '36px';
+      });
+    });
+
+    /* ----- NAVBAR: FUNDO AO ROLAR ----- */
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    /* ----- MENU MOBILE ----- */
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', () => {
+      mobileMenu.classList.toggle('open');
+    });
+
+    function closeMobile() {
+      mobileMenu.classList.remove('open');
+    }
+
+    /* ----- SCROLL REVEAL ----- */
+    // Observa os elementos com classe .reveal e adiciona .visible quando entram na tela
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    /* ----- FILTRO DE PROJETOS ----- */
+    function filterProjects(btn, category) {
+      // Atualiza botão ativo
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Mostra/oculta cards com animação
+      document.querySelectorAll('.projeto-card').forEach(card => {
+        const match = category === 'todos' || card.dataset.cat === category;
+        card.style.transition = 'opacity 0.4s, transform 0.4s';
+        card.style.opacity    = match ? '1' : '0.2';
+        card.style.transform  = match ? 'scale(1)' : 'scale(0.97)';
+        card.style.pointerEvents = match ? 'all' : 'none';
+      });
+    }
+
+    /* ----- FORMULÁRIO DE CONTATO ----- */
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
+
+      // Simulação de envio — substitua por fetch real para seu backend
+      setTimeout(() => {
+        btn.textContent = '✓ Mensagem enviada!';
+        btn.style.background = '#2a7a2a';
+        // Reset após 3 segundos
+        setTimeout(() => {
+          btn.textContent = 'Enviar mensagem';
+          btn.style.background = '';
+          btn.disabled = false;
+          e.target.reset();
+        }, 3000);
+      }, 1200);
+    }
+
+    /* ----- SMOOTH ANCHOR SCROLL para nav links ----- */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
